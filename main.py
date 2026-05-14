@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu May 14 00:50:32 2026
+
+@author: jessv
+"""
+
 from src.physics import total_a, grav_and_lorentz_force
 import numpy as np
 
