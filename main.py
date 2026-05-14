@@ -8,6 +8,7 @@ import numpy as np
 from src.physics import total_a, grav_and_lorentz_force
 from src.simulation import particle_derivatives1, particle_derivatives2
 from src.integrator import rk4_step
+from src.monte_carlo import particle_population_generator
 
 # Initial Particle State
 
@@ -48,3 +49,52 @@ new_state2 = rk4_step(
 
 print("Updated State Vector:")
 print(new_state1, new_state2)
+
+# Monte Carlo Simulation Parameters
+
+NUM_PARTICLES = 10
+
+SPEED_MEAN = 5.0       # m/s
+SPEED_STD = 1.0        # m/s
+
+ANGLE_MIN = 60         # degrees
+ANGLE_MAX = 120        # degrees
+
+CHARGE_MEAN = 1e-6     # Coulombs
+CHARGE_STD = 2e-7      # Coulombs
+
+MASS = 1e-3            # kg
+
+SEED = 4222
+
+
+# Generate Particle Population
+
+states, charges, masses = particle_population_generator(
+    num_particles=NUM_PARTICLES,
+    speed_avg=SPEED_MEAN,
+    speed_std=SPEED_STD,
+    angle_min_deg=ANGLE_MIN,
+    angle_max_deg=ANGLE_MAX,
+    charge_avg=CHARGE_MEAN,
+    charge_std=CHARGE_STD,
+    mass=MASS,
+    seed=SEED
+)
+
+
+# --------------------------------------------------
+# Display Results
+# --------------------------------------------------
+
+print("\nParticle State Matrix:")
+print(states)
+
+print("\nState Matrix Shape:")
+print(states.shape)
+
+print("\nParticle Charges:")
+print(charges)
+
+print("\nParticle Masses:")
+print(masses)

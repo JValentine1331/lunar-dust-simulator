@@ -48,7 +48,6 @@ def particle_derivatives1(state, t, params):
     acceleration = total_a(charge, mass, efield)
     ax, ay = acceleration
 
-    print(ax,ay)
     # Construct Derivative Vector
     derivatives = np.array([
         vx,   # dx/dt
@@ -74,7 +73,6 @@ def particle_derivatives2(state, t, params):
     a = force / mass
     ax, ay = a
     
-    print(ax,ay)
     # Construct Derivative Vector
     derivatives = np.array([
         vx,   # dx/dt
