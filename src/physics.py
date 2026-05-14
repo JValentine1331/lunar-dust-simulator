@@ -43,7 +43,7 @@ def total_a(charge, mass, efield):
     
     return g_a + e_a
 
-def grav_and_lorentz_force(mass, charge, efield):
+def grav_and_lorentz_force(charge, mass, efield):
     """
     Computes the total force from gravitational and electric components
     Parameters:
@@ -55,7 +55,7 @@ def grav_and_lorentz_force(mass, charge, efield):
         (np.ndarray): Total force vector [Fx, Fy]
     """
     
-    g_a = mass * g()
-    e_a = charge * efield
-    return g_a + e_a
+    gf = mass * g()
+    ef = charge * efield
+    return gf + ef
 
