@@ -10,66 +10,28 @@ from src.simulation import particle_derivatives1, particle_derivatives2
 from src.integrator import rk4_step
 from src.monte_carlo import particle_population_generator
 
-# Initial Particle State
 
-state = np.array([
-    0.0,   # x-position
-    0.0,   # y-position
-    1.0,   # x-velocity
-    5.0    # y-velocity
-])
+# Monte Carlo Population Parameters
+NUM_PARTICLES = 100
 
-# Simulation Parameters
-params = {"charge": 1e-6, "mass": 1e-3, "efield": np.array([0.0, 5.0])}
+SPEED_MEAN = 5.0 #m/s
+SPEED_STD = 1.0 #m/s
 
-# Time Settings
-t = 0.0
-dt = 0.1
+ANGLE_MIN = 60 #degrees
+ANGLE_MAX = 120 #degress
 
-# Advance One RK4 Step
+CHARGE_MEAN = 1e-6 #Coulombs
+CHARGE_STD = 2e-7 #Coulombs
 
-print(particle_derivatives1(state, t, params))
-print("line")
-print(particle_derivatives2(state, t, params))
-new_state1 = rk4_step(
-    particle_derivatives1,
-    state,
-    t,
-    dt,
-    params)
+MASS = 1e-3 #kg
 
-new_state2 = rk4_step(
-    particle_derivatives2, 
-    state,
-    t, 
-    dt, 
-    params)
+SEED = 4223
 
-# Display Results
+#Time Integration Parameters
+DT = 0.05
+NUM_STEPS = 200
 
-print("Updated State Vector:")
-print(new_state1, new_state2)
-
-# Monte Carlo Simulation Parameters
-
-NUM_PARTICLES = 10
-
-SPEED_MEAN = 5.0       # m/s
-SPEED_STD = 1.0        # m/s
-
-ANGLE_MIN = 60         # degrees
-ANGLE_MAX = 120        # degrees
-
-CHARGE_MEAN = 1e-6     # Coulombs
-CHARGE_STD = 2e-7      # Coulombs
-
-MASS = 1e-3            # kg
-
-SEED = 4222
-
-
-# Generate Particle Population
-
+#Generate Initial Population
 states, charges, masses = particle_population_generator(
     num_particles=NUM_PARTICLES,
     speed_avg=SPEED_MEAN,
@@ -79,22 +41,54 @@ states, charges, masses = particle_population_generator(
     charge_avg=CHARGE_MEAN,
     charge_std=CHARGE_STD,
     mass=MASS,
-    seed=SEED
-)
+    seed=SEED)
+
+#Initialize Trajectory Storage
+
+# Shape:
+# [particle_index, timestep_index, state_variable]
 
 
-# --------------------------------------------------
-# Display Results
-# --------------------------------------------------
+trajectories = np.zeros((NUM_PARTICLES,
+                         NUM_STEPS,
+                         4))
 
-print("\nParticle State Matrix:")
-print(states)
+#Storing Initial states
+trajectories[:, 0, :] = states
 
-print("\nState Matrix Shape:")
-print(states.shape)
+#Time evolve the system
+for i in range(1, NUM_STEPS):
+    
+    current_t = i * DT
+    
+    for particle in range(NUM_PARTICLES):
+        current_state = trajectories[particle, i - 1,:]
+        
+        params = {"charge": charges[particle],
+                  "mass": masses[particle],
+                  "efield": np.array([0.0, 5.0])}
+        
+        next_state = rk4_step(particle_derivatives2, 
+                              current_state, 
+                              current_t, 
+                              DT, 
+                              params)
+        
+        # Surface Collision Condition
+        if next_state[1] < 0:
+        
+            # Clamp particle to surface
+            next_state[1] = 0
 
-print("\nParticle Charges:")
-print(charges)
+            # Zero vertical velocity
+            next_state[3] = 0
+            
+            
+        trajectories[particle, i, :] = next_state
+        
+#Display Simulation Info
+print("\nTrajectory Array Shape:")
+print(trajectories.shape)
 
-print("\nParticle Masses:")
-print(masses)
+print("\nExample Final Particle State:")
+print(trajectories[0, -1, :])
