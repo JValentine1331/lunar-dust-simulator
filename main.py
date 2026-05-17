@@ -10,6 +10,7 @@ from src.simulation import particle_derivatives1, particle_derivatives2
 from src.integrator import rk4_step
 from src.monte_carlo import particle_population_generator
 from src.visualization import plot_trajectories, plot_landing_distribution
+from src.analysis import landing_distance, max_heights, airborne_durations, summarize_metric
 
 # Monte Carlo Population Parameters
 NUM_PARTICLES = 100
@@ -30,7 +31,7 @@ L = 10.0 #m
 
 MASS = 1e-3 #kg
 
-SEED = 4223
+SEED = 500
 
 #Time Integration Parameters
 DT = 0.05
@@ -111,3 +112,21 @@ print(trajectories[0, -1, :])
 
 plot_trajectories(trajectories, charges)
 plot_landing_distribution(trajectories)
+
+# Statistical Analysis
+# --------------------------------------------------
+
+landing_x = landing_distance(trajectories)
+
+max_heights = max_heights(trajectories)
+
+flight_times = airborne_durations(
+    trajectories,
+    DT
+)
+
+summarize_metric(landing_x, "Landing Distance (m)")
+
+summarize_metric(max_heights, "Maximum Height (m)")
+
+summarize_metric(flight_times, "Airborne Duration (s)")
