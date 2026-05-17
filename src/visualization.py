@@ -66,17 +66,9 @@ def plot_landing_distribution(trajectories):
 
     plt.figure(figsize=(10, 4))
 
-    plt.scatter(
-        final_x,
-        final_y,
-        alpha=0.7
-    )
+    plt.scatter(final_x, final_y, alpha=0.7)
 
-    plt.axhline(
-        y=0,
-        color='black',
-        linestyle='--'
-    )
+    plt.axhline(y=0, color='black', linestyle='--')
 
     plt.xlabel("Final x-position (m)")
     plt.ylabel("Final y-position (m)")
@@ -89,4 +81,30 @@ def plot_landing_distribution(trajectories):
     # Save figure
     plt.savefig("results/landing_distribution.png", dpi=300, bbox_inches='tight')
 
+    plt.show()
+    
+def histogram(values, xlabel, title, filename, bins=20):
+    """
+    Plots and saves histogram of simulation metrics.
+
+    Parameters
+        values : (np.ndarray): Data values
+        xlabel : (str): x-axis label
+        title : (str): Plot title
+        filename : (str): Output filename
+        bins : (int): Number of histogram bin
+    """
+    #Remove NaN values
+    values = values[~np.isnan(values)]
+    
+    plt.figure(figsize=(8,5))
+    plt.hist(values, bins=bins, alpha=0.8)
+    plt.xlabel(xlabel)
+    plt.ylabel("Count")
+    plt.title(title)
+    plt.grid(True)
+    
+    #create results directory and store
+    os.makedirs("results", exist_ok=True)
+    plt.savefig(f"results/{filename}",dpi=300,bbox_inches='tight')
     plt.show()

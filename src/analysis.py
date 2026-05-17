@@ -35,40 +35,65 @@ def max_heights(trajectories):
 
 def airborne_durations(trajectories, dt):
     """
-    Estimates airborne duration for each particle.
+    Computes airborne durations using explicit
+    launch and landing event detection.
 
     Parameters
-        trajectories : (np.ndarray)
-
-        dt : (float): Simulation timestep
+        trajectories : np.ndarray
+    
+        dt : float
+            Simulation timestep
 
     Returns
-        (np.ndarray): Estimated airborne durations
+    np.ndarray
+        Airborne durations
     """
     
     num_particles = trajectories.shape[0]
+
     durations = np.full(num_particles, np.nan)
-    
-    for i in range(num_particles):
-        y = trajectories[i,:,1]
-        
-        #ignore particles that never leave the ground
-        if np.max(y) < 0.01:
-            durations[i] = np.nan
-            continue
-        else:
-            pass
-        
-        indices = np.where(y <= 0)[0]
-        
-        if len(indices > 1):
-            landing_step = indices[0] + 1 
-            durations[i] = landing_step * dt
-            
-        else:
-            durations[i] = np.nan
-            
-        return durations
+
+    MIN_HEIGHT = 0.01
+
+    for particle_idx in range(num_particles):
+
+        y = trajectories[particle_idx, :, 1]
+
+        launched = False
+        launch_step = None
+        landing_step = None
+
+        # ---------------------------------
+        # Detect launch + landing events
+        # ---------------------------------
+
+        for step in range(1, len(y)):
+
+            # Detect first meaningful lofting
+            if not launched and y[step] > MIN_HEIGHT:
+
+                launched = True
+                launch_step = step
+
+            # Detect landing AFTER launch
+            elif launched:
+
+                if y[step - 1] > 0 and y[step] <= 0:
+
+                    landing_step = step
+                    break
+
+        # ---------------------------------
+        # Compute duration
+        # ---------------------------------
+
+        if launch_step is not None and landing_step is not None:
+
+            durations[particle_idx] = (
+                landing_step - launch_step
+            ) * dt
+
+    return durations
     
 def summarize_metric(values, label):
     """
