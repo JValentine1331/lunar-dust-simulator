@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def plot_trajectories(trajectories, charges):
+def plot_trajectories(trajectories, charges, E0=None):
     """
     Plots particle trajectories in x-y space.
 
@@ -38,7 +38,12 @@ def plot_trajectories(trajectories, charges):
     
     plt.xlabel("x-position (m)")
     plt.ylabel("y-position (m)")
-    plt.title("Monte Carlo Lunar Dust Trajectories")
+    
+    if E0 is not None: 
+        plt.title(f"Particle Trajectories (E0 = {E0} N/C)")
+    else:
+        plt.title("Particle Trajectories")
+    
     plt.grid()
     plt.axhline(y=0, color='black', linestyle='--', linewidth=1)
     
@@ -53,10 +58,16 @@ def plot_trajectories(trajectories, charges):
     os.makedirs("results", exist_ok=True)
 
     # Save figure
-    plt.savefig("results/trajectory_plot.png", dpi=300, bbox_inches='tight')
+    if E0 is not None:
+        filename = (f"results/trajectory_plot_E0_{E0}.png")
+
+    else:
+        filename = "results/trajectory_plot.png"
+
+    plt.savefig(filename)
     plt.show()
     
-def plot_landing_distribution(trajectories):
+def plot_landing_distribution(trajectories, E0=None):
     """
     Plots final landing positions of particles.
     """
@@ -72,15 +83,22 @@ def plot_landing_distribution(trajectories):
 
     plt.xlabel("Final x-position (m)")
     plt.ylabel("Final y-position (m)")
-    plt.title("Particle Landing Distribution")
+    if E0 is not None: 
+        plt.title(f"Particle Landing Positions (E0 = {E0} N/C)")
+    else:
+        plt.title("Particle Landing Positions")
     plt.grid(True)
 
     # Create results directory if needed
     os.makedirs("results", exist_ok=True)
     
-    # Save figure
-    plt.savefig("results/landing_distribution.png", dpi=300, bbox_inches='tight')
+    if E0 is not None:
 
+        filename = (f"results/landing_distribution_E0_{E0}.png")
+    else:
+        filename = ("results/landing_distribution.png")
+
+    plt.savefig(filename)
     plt.show()
     
 def histogram(values, xlabel, title, filename, bins=20):
@@ -95,6 +113,7 @@ def histogram(values, xlabel, title, filename, bins=20):
         bins : (int): Number of histogram bin
     """
     #Remove NaN values
+    values = np.asarray(values, dtype=float)
     values = values[~np.isnan(values)]
     
     plt.figure(figsize=(8,5))
@@ -107,4 +126,42 @@ def histogram(values, xlabel, title, filename, bins=20):
     #create results directory and store
     os.makedirs("results", exist_ok=True)
     plt.savefig(f"results/{filename}",dpi=300,bbox_inches='tight')
+    plt.show()
+    
+def parameter_study_plot(x_values, y_values, xlabel,ylabel,title,filename):
+    """
+    Plots parameter-study trends.
+    
+    Parameters
+       x_values : list or np.ndarray
+           Parameter values
+    
+       y_values : list or np.ndarray
+           Metric values
+    
+       xlabel : str
+           x-axis label
+    
+       ylabel : str
+           y-axis label
+    
+       title : str
+           Plot title
+    
+       filename : str
+           Output filename
+    """
+    plt.figure(figsize=(8, 5))
+    plt.plot(x_values, y_values, marker='o')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.grid(True)
+
+    # Create results directory if needed
+    os.makedirs("results", exist_ok=True)
+
+    # Save figure
+    plt.savefig(f"results/{filename}", dpi=300, bbox_inches='tight' )
+
     plt.show()
