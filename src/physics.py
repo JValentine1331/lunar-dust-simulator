@@ -59,3 +59,5 @@ def grav_and_lorentz_force(charge, mass, efield):
     ef = charge * efield
     return gf + ef
 
+def electric_field(y, E0, L):
+    return np.array([0.0,E0 * np.exp(-y / L)])

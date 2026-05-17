@@ -7,7 +7,7 @@ Created on Thu May 14 00:50:32 2026
 
 import numpy as np
 
-from src.physics import total_a, grav_and_lorentz_force
+from src.physics import total_a, grav_and_lorentz_force, electric_field
 
 def particle_derivatives1(state, t, params):
     """
@@ -29,7 +29,8 @@ def particle_derivatives1(state, t, params):
         Dictionary containing:
             charge
             mass
-            electric_field
+            E0
+            L
 
     Returns
         np.ndarray: Time derivative of state vector:
@@ -42,7 +43,11 @@ def particle_derivatives1(state, t, params):
     # Retrieve Simulation Parameters
     charge = params["charge"]
     mass = params["mass"]
-    efield = params["efield"]
+    E0 = params['E0']
+    L = params["L"]
+    
+    #compute E field
+    efield = electric_field(y, E0, L)
 
     # Compute Acceleration
     acceleration = total_a(charge, mass, efield)
@@ -66,7 +71,11 @@ def particle_derivatives2(state, t, params):
     # Retrieve Simulation Parameters
     charge = params["charge"]
     mass = params["mass"]
-    efield = params["efield"]
+    E0 = params['E0']
+    L = params["L"]
+    
+    #compute E field
+    efield = electric_field(y, E0, L)
 
     # Compute Acceleration
     force = grav_and_lorentz_force(charge, mass, efield)

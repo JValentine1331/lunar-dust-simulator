@@ -5,7 +5,7 @@ Created on Thu May 14 00:50:32 2026
 @author: jessv
 """
 import numpy as np
-from src.physics import total_a, grav_and_lorentz_force
+from src.physics import total_a, grav_and_lorentz_force, electric_field
 from src.simulation import particle_derivatives1, particle_derivatives2
 from src.integrator import rk4_step
 from src.monte_carlo import particle_population_generator
@@ -23,7 +23,10 @@ ANGLE_MAX = 120 #degress
 CHARGE_MEAN = 1e-6 #Coulombs
 CHARGE_STD = 2e-7 #Coulombs
 
-EFIELD = np.array([0.0, 500.0]) #N/Coulomb
+#EFIELD = np.array([0.0, 1000.0]) #N/Coulomb
+E0 = 5000.0 #Coulombs
+L = 10.0 #m
+#EFIELD = electric_field(y, E0, L)
 
 MASS = 1e-3 #kg
 
@@ -77,7 +80,8 @@ for i in range(1, NUM_STEPS):
         
         params = {"charge": charges[particle],
                   "mass": masses[particle],
-                  "efield": EFIELD}
+                  "E0": E0,
+                  "L": L}
         
         next_state = rk4_step(particle_derivatives2, 
                               current_state, 
